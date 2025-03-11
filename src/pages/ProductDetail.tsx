@@ -1,7 +1,8 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import axios from "../utils/AxiosInstance";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "../utils/AxiosInstance";
 import { useEffect } from "react";
+
 interface ProductDetail {
   id: number;
   title: string;
@@ -49,7 +50,7 @@ interface DeletedProduct extends ProductDetail {
   deletedOn: string;
 }
 
-const fetchProductDetail = async (id: string | undefined) => {
+export const fetchProductDetail = async (id: string | undefined) => {
   return await axios.get<ProductDetail>(`/product/${id}`);
 };
 
@@ -140,24 +141,23 @@ const ProductDetailSkeleton = () => {
     </div>
   );
 };
-
 const ProductDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const getProductDetail = useQuery({
     queryKey: ["productDetail", id],
-    queryFn: () => fetchProductDetail(id),
+    queryFn: () => fetchProductDetail(id)
   });
   const deleteProductMutation = useMutation({
-    mutationFn: () => deleteProduct(id),
+    mutationFn: () => deleteProduct(id)
   });
+  const product: ProductDetail | undefined = getProductDetail.data?.data;
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (deleteProductMutation.isSuccess) {
       navigate("/product", { replace: true });
     }
   }, [deleteProductMutation.isSuccess]);
-
-  const product: ProductDetail | undefined = getProductDetail.data?.data;
   return (
     <div>
       {getProductDetail.isFetching || product === undefined ? (
@@ -344,7 +344,7 @@ const ProductDetail = () => {
           <div className="absolute bottom-14 right-0 bg-white rounded-lg shadow-lg w-32 hidden group-focus-within:block">
             <button
               onClick={() => {
-                // navigate("edit");
+                navigate("edit");
               }}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
             >
